@@ -1,10 +1,14 @@
 /**
-
-	use:
+	Plugin for creation of referenced (1-n) fields in HTML.
+	
+	Dependencies (see example.html):
 		jquery
 		jquery-ui
 		
 		slickgrid
+		
+	@author Kael Santini
+	@since 06/08/2012
 
 **/
 (function($) {
@@ -79,9 +83,7 @@
 			this._dialogButton.click($.proxy(this, "_dialogButtonClick"));
 			
 			this._dialog = $("<div>").attr("title", this.options.title);
-			
-			//this._container = $("<div>").addClass("ui-widget-content ui-corner-all").css("display", "inline-block").appendTo(this._dialog);
-			//this._container = $("<div>").appendTo(this._dialog);
+						
 			this._container = this._dialog;
 			
 			this._termInput = $("<input>").attr("type", "text").addClass("text ui-widget-content ui-corner-all").css("width", "100%");
@@ -109,7 +111,7 @@
 				this._gridContainer = $("<div>").css("height", this.options.dialogOptions.height - 100).appendTo(this._container);
 				this._slickGrid = new Slick.Grid(this._gridContainer[0], [], this.options.gridOptions.columns, this.options.gridOptions);
 				this._slickGrid.setSelectionModel(new Slick.RowSelectionModel());
-				//
+				// change columns and register plugin if necessary
 				if (this.options.gridOptions.multiSelect) {
 					var checkboxSelector = new Slick.CheckboxSelectColumn({
 						cssClass: "slick-cell-checkboxsel"
@@ -127,7 +129,6 @@
 			if (this.options.cachedResults.length > 0) {
 				this._updateGrid(this.options.cachedResults);
 			} else {
-				//this._trigger("search", [ this._updateGrid ]);
 				this.options.search(this._termInput.val(), $.proxy(this, "updateGrid"));
 			}
 		},
@@ -148,10 +149,6 @@
 		// overriding factory method
 		_setOption: function( key, value ) {
 			$.Widget.prototype._setOption.apply( this, arguments );
-			switch( key ) {
-			case "clear":
-			   break;
-			}
 		}
 	});
 }(jQuery));
