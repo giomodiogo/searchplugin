@@ -123,10 +123,16 @@
 		},
 		
 		_searchButtonClick: function(){
+			var term = this._termInput.val();
 			if (this.options.cachedResults.length > 0) {
+				var result = [];
+				for (var i = 0; i < this.options.cachedResults.length; i++) {
+					if (this.options.cachedResults[i].label.search[term] != -1)
+						result.push(this.options.cachedResults[i]);
+				}
 				this._updateGrid(this.options.cachedResults);
 			} else {
-				this.options.search(this._termInput.val(), $.proxy(this, "updateGrid"));
+				this.options.search(term, $.proxy(this, "updateGrid"));
 			}
 		},
 		
@@ -139,6 +145,12 @@
 		},
 		
 		updateGrid: function(data) {
+		
+			// convert data for the format of grid
+			for (var i = 0; i < data.length; i++) {
+				data[i] = {  "id" : data[i][0], "label" : data[i][1] };
+			}
+		
 			this._slickGrid.invalidateAllRows();
 			this._slickGrid.setData(data);
 			this._slickGrid.render();
