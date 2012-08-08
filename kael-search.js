@@ -65,18 +65,15 @@
 			}
 			
 		},
-
-		_create: function() {
-			
-			// manipulate events on _create method 
-			
-			
-		},
 		
 		_init: function() {
 		
+			this.element.hide();
+			this._newElement = this.element.clone();
+			this._newElement.removeAttr("id").removeAttr("name").insertBefore(this.element).show();
+		
 			if (this.options.disableInput)
-				this.element.attr("readonly", "readonly").attr("disabled", "disabled");
+				this._newElement.attr("readonly", "readonly").attr("disabled", "disabled");
 		
 			this._dialogButton = $("<button>").button(this.options.buttonFinderOptions);
 			this._dialogButton.insertAfter(this.element);
@@ -136,7 +133,8 @@
 		_okButtonClick: function() {
 			var selectedRows = this._slickGrid.getSelectedRows();
 			var selectedItem = this._slickGrid.getDataItem(selectedRows[0]);
-			this.element.val(selectedItem.label);
+			this.element.val(selectedItem.id);
+			this._newElement.val(selectedItem.label);
 			this._dialog.dialog("close");
 		},
 		
