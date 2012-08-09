@@ -73,7 +73,7 @@
 			this._newElement.removeAttr("id").removeAttr("name").insertBefore(this.element).show();
 		
 			if (this.options.disableInput)
-				this._newElement.attr("readonly", "readonly").attr("disabled", "disabled");
+				this._newElement.attr("readonly", "readonly");
 		
 			this._dialogButton = $("<button>").button(this.options.buttonFinderOptions);
 			this._dialogButton.insertAfter(this.element);
@@ -92,7 +92,7 @@
 			this._searchButton.click($.proxy(this, "_searchButtonClick"));
 			
 			this.options.dialogOptions.buttons = {};
-			this.options.dialogOptions.buttons.OK = $.proxy(this, "_okButtonClick");
+			this.options.dialogOptions.buttons.OK = $.proxy(this, "_itemSelected");
 			this._dialog.dialog(this.options.dialogOptions);
 			
 		},
@@ -105,9 +105,10 @@
 		_configureGrid: function() {
 			if (!this._slickGrid) {
 				
-				this._gridContainer = $("<div>").css("height", this.options.dialogOptions.height - 100).appendTo(this._container);
+				this._gridContainer = $("<div>").css("height", this._container.height() - 20).appendTo(this._container);
 				this._slickGrid = new Slick.Grid(this._gridContainer[0], [], this.options.gridOptions.columns, this.options.gridOptions);
 				this._slickGrid.setSelectionModel(new Slick.RowSelectionModel());
+				this._slickGrid.onDblClick.subscribe($.proxy(this, "_itemSelected"));
 				// change columns and register plugin if necessary
 				if (this.options.gridOptions.multiSelect) {
 					var checkboxSelector = new Slick.CheckboxSelectColumn({
@@ -117,42 +118,50 @@
 					this._slickGrid.setColumns(this.options.gridOptions.columns);
 					this._slickGrid.registerPlugin(checkboxSelector)
 				}
-				
-				
 			}
 		},
 		
 		_searchButtonClick: function(){
 			var term = this._termInput.val();
 			if (this.options.cachedResults.length > 0) {
-				var result = [];
-				for (var i = 0; i < this.options.cachedResults.length; i++) {
-					if (this.options.cachedResults[i].label.search[term] != -1)
-						result.push(this.options.cachedResults[i]);
-				}
-				this._updateGrid(this.options.cachedResults);
+				var results = this._filterCachedResults(term);
+				this.updateGrid(results);
 			} else {
 				this.options.search(term, $.proxy(this, "updateGrid"));
 			}
 		},
 		
-		_okButtonClick: function() {
+		_filterCachedResults: function(term) {
+			var matcher = new RegExp(term.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&"), "i");
+			return $.grep( this.options.cachedResults, function(value) {
+				return matcher.test(value[1]);
+			});
+		},
+		
+		_itemSelected: function() {
+			var selectedItem = this.getSelectedItem();
+			if (selectedItem) {
+				this.element.val(selectedItem.id);
+				this._newElement.val(selectedItem.label);
+			}
+			this._dialog.dialog("close");
+		},
+				
+		getSelectedItem: function() {
 			var selectedRows = this._slickGrid.getSelectedRows();
 			var selectedItem = this._slickGrid.getDataItem(selectedRows[0]);
-			this.element.val(selectedItem.id);
-			this._newElement.val(selectedItem.label);
-			this._dialog.dialog("close");
+			return selectedItem;
 		},
 		
 		updateGrid: function(data) {
-		
 			// convert data for the format of grid
+			var gridData = [];
 			for (var i = 0; i < data.length; i++) {
-				data[i] = {  "id" : data[i][0], "label" : data[i][1] };
+				gridData[i] = {  "id" : data[i][0], "label" : data[i][1] };
 			}
 		
 			this._slickGrid.invalidateAllRows();
-			this._slickGrid.setData(data);
+			this._slickGrid.setData(gridData);
 			this._slickGrid.render();
 		},
 		

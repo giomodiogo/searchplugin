@@ -25,7 +25,16 @@
 		
 			$(function(){
 			
-				$("input").kaelsearch({
+				$("input[name=product]").kaelsearch({
+					cachedResults:[
+						[1, "Product X"],
+						[2, "Product XY"],
+						[3, "Product XYZ"]
+					]
+				});
+				
+				$("input[name=user]").kaelsearch({
+					title: "not filtering",
 					search : function(term, updateGrid){
 						$.getJSON("example.json?str="+term, updateGrid);
 					}
@@ -38,8 +47,10 @@
 	
 	<body>
 		
-		<label>Find something:</label>
+		<label>Find user:</label>
 		<input name="user" type="text" class="text ui-widget-content ui-corner-all" />
-
+		<br />
+		<label>Find product:</label>
+		<input name="product" type="text" class="" />
 	</body>
 </html>
