@@ -109,6 +109,7 @@
 				this._slickGrid = new Slick.Grid(this._gridContainer[0], [], this.options.gridOptions.columns, this.options.gridOptions);
 				this._slickGrid.setSelectionModel(new Slick.RowSelectionModel());
 				this._slickGrid.onDblClick.subscribe($.proxy(this, "_itemSelected"));
+				this._slickGrid.onKeyDown.subscribe($.proxy(this, "_keyPressed"));
 				// change columns and register plugin if necessary
 				if (this.options.gridOptions.multiSelect) {
 					var checkboxSelector = new Slick.CheckboxSelectColumn({
@@ -145,6 +146,12 @@
 				this._newElement.val(selectedItem.label);
 			}
 			this._dialog.dialog("close");
+		},
+		
+		_keyPressed: function(e) {
+			if (e.keyCode == 13) {
+				this._itemSelected();
+			}
 		},
 				
 		getSelectedItem: function() {
