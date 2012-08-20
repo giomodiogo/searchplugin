@@ -127,8 +127,10 @@
 			if (this.options.cachedResults.length > 0) {
 				var results = this._filterCachedResults(term);
 				this.updateGrid(results);
-			} else {
+			} else if ($.isFunction(this.options.search)) {
 				this.options.search(term, $.proxy(this, "updateGrid"));
+			} else if (typeof this.options.search == "string") {
+				this._doSearch(term);
 			}
 		},
 		
@@ -152,6 +154,26 @@
 			if (e.keyCode == 13) {
 				this._itemSelected();
 			}
+		},
+		
+		_doSearch: function(term) {
+			var self = this;
+			if (this._req) this._req.abort();
+			this._req = $.ajax({
+				url : this.options.search,
+				type : "GET",
+				dataType: "json",
+				data : { term : term },
+				success: function(json) {
+					self.updateGrid(json);
+				},
+				error: function() {
+					self.updateGrid([]);
+				},
+				complete: function() {
+					self._req = undefined;
+				}
+			});
 		},
 				
 		getSelectedItem: function() {
