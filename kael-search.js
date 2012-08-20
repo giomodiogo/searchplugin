@@ -169,9 +169,6 @@
 				},
 				error: function() {
 					self.updateGrid([]);
-				},
-				complete: function() {
-					self._req = undefined;
 				}
 			});
 		},

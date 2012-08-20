@@ -26,7 +26,7 @@
 			$(function(){
 			
 				$("input[name=product]").kaelsearch({
-					cachedResults:[
+					cachedResults: [
 						[1, "Product X"],
 						[2, "Product XY"],
 						[3, "Product XYZ"]
@@ -35,9 +35,14 @@
 				
 				$("input[name=user]").kaelsearch({
 					title: "not filtering",
-					search : function(term, updateGrid){
+					search: function(term, updateGrid){
 						$.getJSON("example.json?str="+term, updateGrid);
 					}
+				});
+				
+				$("input[name=remotesource]").kaelsearch({
+					title: "remote",
+					search: "products/search"
 				});
 			
 			});
@@ -52,5 +57,8 @@
 		<br />
 		<label>Find product:</label>
 		<input name="product" type="text" class="" />
+		<br />
+		<label>Another test:</label>
+		<input name="remotesource" type="text" class="" />
 	</body>
 </html>
