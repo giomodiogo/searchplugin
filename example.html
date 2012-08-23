@@ -41,8 +41,12 @@
 				});
 				
 				$("input[name=remotesource]").kaelsearch({
-					title: "remote",
-					search: "products/search"
+					cachedResults: [
+						[1, "Product X"],
+						[2, "Product XY"],
+						[3, "Product XYZ"]
+					],
+					buttonSearch : "button.trigger"
 				});
 			
 			});
@@ -60,5 +64,7 @@
 		<br />
 		<label>Another test:</label>
 		<input name="remotesource" type="text" class="" />
+		<br />
+		<button class="trigger">This element fires event</button>
 	</body>
 </html>

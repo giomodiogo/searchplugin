@@ -27,6 +27,7 @@
 				text: false
 			},
 			
+			buttonSearch: null,
 			buttonSearchOptions : {
 				icons: {
 					primary: "ui-icon-search"
@@ -75,8 +76,7 @@
 			if (this.options.disableInput)
 				this._newElement.attr("readonly", "readonly");
 		
-			this._dialogButton = $("<button>").button(this.options.buttonFinderOptions);
-			this._dialogButton.insertAfter(this.element);
+			this._dialogButton = this._getSearchButtonElement();
 			this._dialogButton.click($.proxy(this, "_dialogButtonClick"));
 			
 			this._dialog = $("<div>").attr("title", this.options.title);
@@ -95,6 +95,17 @@
 			this.options.dialogOptions.buttons.OK = $.proxy(this, "_itemSelected");
 			this._dialog.dialog(this.options.dialogOptions);
 			
+		},
+		
+		_getSearchButtonElement: function() {
+			var $button;
+			if (this.options.buttonSearch) {
+				$button = $(this.options.buttonSearch);
+			} else {
+				$button = $("<button>").button(this.options.buttonFinderOptions);
+				$button.insertAfter(this.element);
+			}
+			return $button;
 		},
 		
 		_dialogButtonClick: function() {
