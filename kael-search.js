@@ -7,7 +7,6 @@
 		
 	@author Kael Santini
 	@since 06/08/2012
-
 **/
 (function($) {
 	var requiredMethods = [ "newGrid", "registerEvent", "getSelectedItems", "updateGrid" ];
