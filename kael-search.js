@@ -5,16 +5,16 @@
 		jquery
 		jquery-ui
 		
-		slickgrid
-		
 	@author Kael Santini
 	@since 06/08/2012
 
 **/
 (function($) {
+	var requiredMethods = [ "newGrid", "registerEvent", "getSelectedItems", "updateGrid" ];
 	$.widget( "ui-helpers.kaelsearch", {
-
 		options: {
+			gridProvider: null, // an grid implementation
+		
 			title: "Search",
 			disableInput: true,
 			cachedResults: [],
@@ -64,11 +64,16 @@
 				forceFitColumns: true,
 				multiSelect: false
 			}
-			
 		},
 		
 		_init: function() {
 		
+			if (!this.options.gridProvider)
+				throw "kaelsearch: plugin requires gridProvider implementation to be loaded";				
+			for (var i = 0; i < requiredMethods.length; i++)
+				if (requiredMethods[i] in this.options.gridProvider == false)
+					throw "kaelsearch: this implementation of gridProvider require methods: " + requiredMethods.join(", ");
+			
 			this.element.hide();
 			this._newElement = this.element.clone();
 			this._newElement.removeAttr("id").removeAttr("name").insertBefore(this.element).show();
@@ -94,7 +99,6 @@
 			this.options.dialogOptions.buttons = {};
 			this.options.dialogOptions.buttons.OK = $.proxy(this, "_itemSelected");
 			this._dialog.dialog(this.options.dialogOptions);
-			
 		},
 		
 		_getSearchButtonElement: function() {
@@ -114,22 +118,11 @@
 		},
 		
 		_configureGrid: function() {
-			if (!this._slickGrid) {
-				
+			if (!this._grid) {
 				this._gridContainer = $("<div>").css("height", this._container.height() - 20).appendTo(this._container);
-				this._slickGrid = new Slick.Grid(this._gridContainer[0], [], this.options.gridOptions.columns, this.options.gridOptions);
-				this._slickGrid.setSelectionModel(new Slick.RowSelectionModel());
-				this._slickGrid.onDblClick.subscribe($.proxy(this, "_itemSelected"));
-				this._slickGrid.onKeyDown.subscribe($.proxy(this, "_keyPressed"));
-				// change columns and register plugin if necessary
-				if (this.options.gridOptions.multiSelect) {
-					var checkboxSelector = new Slick.CheckboxSelectColumn({
-						cssClass: "slick-cell-checkboxsel"
-					});
-					this.options.gridOptions.columns.splice(0, 0 , checkboxSelector.getColumnDefinition());
-					this._slickGrid.setColumns(this.options.gridOptions.columns);
-					this._slickGrid.registerPlugin(checkboxSelector)
-				}
+				this._grid = this.options.gridProvider.newGrid(this);
+				this._grid.registerEvent("doubleClick", $.proxy(this, "_itemSelected"));
+				this._grid.registerEvent("keyDown", $.proxy(this, "_itemSelected"));
 			}
 		},
 		
@@ -183,23 +176,13 @@
 				}
 			});
 		},
-				
+		
 		getSelectedItem: function() {
-			var selectedRows = this._slickGrid.getSelectedRows();
-			var selectedItem = this._slickGrid.getDataItem(selectedRows[0]);
-			return selectedItem;
+			return this.options.gridProvider.getSelectedItems();
 		},
 		
 		updateGrid: function(data) {
-			// convert data for the format of grid
-			var gridData = [];
-			for (var i = 0; i < data.length; i++) {
-				gridData[i] = {  "id" : data[i][0], "label" : data[i][1] };
-			}
-		
-			this._slickGrid.invalidateAllRows();
-			this._slickGrid.setData(gridData);
-			this._slickGrid.render();
+			return this.options.gridProvider.updateGrid(data);
 		},
 		
 		// overriding factory method

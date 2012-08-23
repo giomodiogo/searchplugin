@@ -20,12 +20,16 @@
 		<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/smoothness/jquery-ui.css" />
 		
 		<!-- -->
+		<script type="text/javascript" src="slickgridprovider.js"></script>
 		<script type="text/javascript" src="kael-search.js"></script>
 		<script type="text/javascript">
+		
+			var Providers = $.extend({ "SlickGrid" : SlickGridProvider });
 		
 			$(function(){
 			
 				$("input[name=product]").kaelsearch({
+					gridProvider : Providers.SlickGrid(),
 					cachedResults: [
 						[1, "Product X"],
 						[2, "Product XY"],
@@ -34,6 +38,7 @@
 				});
 				
 				$("input[name=user]").kaelsearch({
+					gridProvider : Providers.SlickGrid(),
 					title: "not filtering",
 					search: function(term, updateGrid){
 						$.getJSON("example.json?str="+term, updateGrid);
@@ -41,6 +46,7 @@
 				});
 				
 				$("input[name=remotesource]").kaelsearch({
+					gridProvider : Providers.SlickGrid(),
 					cachedResults: [
 						[1, "Product X"],
 						[2, "Product XY"],
