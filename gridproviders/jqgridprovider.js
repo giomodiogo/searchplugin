@@ -22,22 +22,23 @@ var jqGridProvider = function() {
 			colModel.push({
 				"name" : columns[i].field,
 				"index" : columns[i].field,
-				"width" : columns[i].width
+				"width" : columns[i].width || 100
 			});
 		}
 		
 		$table = $("<table></table>").appendTo(_options._gridContainer);
-		/*$table.jqGrid({
+		$grid = $table.jqGrid({
 			datatype: "json",
 			colNames: colNames,
 			colModel: colModel,
-			rowNum:10,
+			rowNum: 10,
 			sortname: 'id',
 			viewrecords: true,
-			sortorder: "desc"
-		});*/
-		
-		//$grid = new Slick.Grid(_options._gridContainer[0], [], _options.options.gridOptions.columns, _options.options.gridOptions);
+			sortorder: "desc",
+			autowidth: true,
+			height: "100%"
+		});
+
 		return this;
 	};
 	
@@ -46,14 +47,25 @@ var jqGridProvider = function() {
 		// convert data for the format of grid
 		var gridData = [];
 		for (var i = 0; i < data.length; i++) {
-			gridData[i] = {  "id" : data[i][0], "label" : data[i][1] };
+			gridData[i] = { "id" : data[i][0], "label" : data[i][1] };
 		}
+	
+		for (var i = 0; i <= gridData.length; i++)
+			$grid.jqGrid('addRowData', i + 1, gridData[i]);
+		$grid.trigger("reloadGrid");
+	};
+	
+	var getSelecteditems = function() {
+		
+		var s = jQuery("#list9").jqGrid('getGridParam','selarrrow');
+		
+		
 	};
 
 	return {
 		"newGrid" : newGrid,
 		"registerEvent" : $.noop,
-		"getSelectedItems" : $.noop,
+		"getSelectedItems" : getSelecteditems,
 		"updateGrid" : updateGrid
 	};
 	
